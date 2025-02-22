@@ -1,0 +1,107 @@
+// Java Project Demonstrating the 5 SOLID Principles: Online Shopping System
+
+// 1. Single Responsibility Principle (SRP): Product class has only one responsibility.
+public class Product {
+    private int id;
+    private String name;
+    private double price;
+
+    public Product(int id, String name, double price) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+}
+
+// 2. Open/Closed Principle (OCP): Payment methods can be extended without modifying existing code.
+interface PaymentStrategy {
+    void pay(double amount);
+}
+
+class CreditCardPayment implements PaymentStrategy {
+    public void pay(double amount) {
+        System.out.println("Paid " + amount + " using Credit Card.");
+    }
+}
+
+class PayPalPayment implements PaymentStrategy {
+    public void pay(double amount) {
+        System.out.println("Paid " + amount + " using PayPal.");
+    }
+}
+
+// 3. Liskov Substitution Principle (LSP): Derived classes can be substituted without affecting functionality.
+abstract class Delivery {
+    public abstract void deliver(String address);
+}
+
+class HomeDelivery extends Delivery {
+    public void deliver(String address) {
+        System.out.println("Delivering to home address: " + address);
+    }
+}
+
+class StorePickup extends Delivery {
+    public void deliver(String address) {
+        System.out.println("Ready for pickup at store location: " + address);
+    }
+}
+
+// 4. Interface Segregation Principle (ISP): Clients only implement necessary interfaces.
+interface OrderOperations {
+    void placeOrder();
+    void cancelOrder();
+}
+
+class Order implements OrderOperations {
+    private Product product;
+    private PaymentStrategy paymentStrategy;
+    private Delivery delivery;
+
+    public Order(Product product, PaymentStrategy paymentStrategy, Delivery delivery) {
+        this.product = product;
+        this.paymentStrategy = paymentStrategy;
+        this.delivery = delivery;
+    }
+
+    public void placeOrder() {
+        paymentStrategy.pay(product.getPrice());
+        delivery.deliver("123 Main Street");
+        System.out.println("Order placed for " + product.getName());
+    }
+
+    public void cancelOrder() {
+        System.out.println("Order for " + product.getName() + " canceled.");
+    }
+}
+
+// 5. Dependency Inversion Principle (DIP): High-level modules depend on abstractions.
+public class OnlineShoppingSystem {
+    public static void main(String[] args) {
+        Product product = new Product(1, "Laptop", 1500.00);
+
+        PaymentStrategy creditCardPayment = new CreditCardPayment();
+        PaymentStrategy payPalPayment = new PayPalPayment();
+
+        Delivery homeDelivery = new HomeDelivery();
+        Delivery storePickup = new StorePickup();
+
+        Order onlineOrder = new Order(product, creditCardPayment, homeDelivery);
+        onlineOrder.placeOrder();
+
+        Order storeOrder = new Order(product, payPalPayment, storePickup);
+        storeOrder.placeOrder();
+    }
+}
